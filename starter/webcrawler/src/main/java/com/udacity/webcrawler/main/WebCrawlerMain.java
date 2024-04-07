@@ -38,30 +38,28 @@ public final class WebCrawlerMain {
     CrawlResultWriter resultWriter = new CrawlResultWriter(result);
 
     // TODO: Write the crawl results to a JSON file (or System.out if the file name is empty)
-    if(!config.getResultPath().isEmpty()){
-      Path resultPath = Path.of(config.getResultPath());
+    if (!this.config.getResultPath().isEmpty()) {
+      Path resultPath = Path.of(this.config.getResultPath());
       resultWriter.write(resultPath);
-    }else{
+    } else {
       try {
         Writer resultLog = new OutputStreamWriter(System.out);
         resultWriter.write(resultLog);
         resultLog.flush();
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         e.printStackTrace();
       }
     }
     // TODO: Write the profile data to a text file (or System.out if the file name is empty)
-    if(!config.getProfileOutputPath().isEmpty()){
-      Path profilePath = Path.of(config.getProfileOutputPath());
+    if (!this.config.getProfileOutputPath().isEmpty()) {
+      Path profilePath = Path.of(this.config.getProfileOutputPath());
       profiler.writeData(profilePath);
-    }else{
+    } else {
       try {
         Writer profileLog = new OutputStreamWriter(System.out);
-        resultWriter.write(profileLog);
+        profiler.writeData(profileLog);
         profileLog.flush();
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         e.printStackTrace();
       }
     }
@@ -74,7 +72,9 @@ public final class WebCrawlerMain {
     }
 
     CrawlerConfiguration config = new ConfigurationLoader(Path.of(args[0])).load();
-    //CrawlerConfiguration config = new ConfigurationLoader(Path.of("starter/webcrawler/src/main/config/sample_config_sequential.json")).load();
+    /*System.out.println("Testing");
+    CrawlerConfiguration config = new ConfigurationLoader(Path.of("src/main/config/sample_config.json")).load();
+    System.out.println("Crawling....");*/
     new WebCrawlerMain(config).run();
   }
 }

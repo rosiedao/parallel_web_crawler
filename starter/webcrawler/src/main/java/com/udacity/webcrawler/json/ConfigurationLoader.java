@@ -28,15 +28,22 @@ public final class ConfigurationLoader {
    *
    * @return the loaded {@link CrawlerConfiguration}.
    */
-  public CrawlerConfiguration load() throws Exception{
+  public CrawlerConfiguration load() throws IOException{
     // TODO: Fill in this method.
     //Your load() method will read the Json string from a file "path" which has already been provided to the ConfigurationLoader constructor
-    try{
-      Reader reader = Files.newBufferedReader(path);
+    /*try{
+        Reader reader = Files.newBufferedReader(path);
         return read(reader);
     }catch (IOException e) {
         e.printStackTrace();
         return null;
+    }*/
+
+    try (Reader reader = Files.newBufferedReader(path)){
+      return read(reader);
+    } catch (Exception ex) {
+      ex.getLocalizedMessage();
+      return null;
     }
     //return new CrawlerConfiguration.Builder().build();
   }
@@ -55,7 +62,6 @@ public final class ConfigurationLoader {
     ObjectMapper mapperObj = new ObjectMapper();
     mapperObj.disable(JsonParser.Feature.AUTO_CLOSE_SOURCE);
 
-    CrawlerConfiguration configuration = mapperObj.readValue(reader, CrawlerConfiguration.Builder.class).build();
-    return configuration;
+    return  mapperObj.readValue(reader, CrawlerConfiguration.Builder.class).build();
   }
 }

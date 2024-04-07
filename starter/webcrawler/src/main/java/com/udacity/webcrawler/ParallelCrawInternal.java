@@ -9,20 +9,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.RecursiveTask;
 import java.util.regex.Pattern;
 
-public class ParallelCrawInternal extends RecursiveTask<Boolean> {
-    private String url;
-    private Instant deadline;
-    private int maxDepth;
-    private Map<String, Integer> counts;
-    private Set<String> visitedUrls;
-    private Clock clock;
-    private PageParserFactory pageParserFactory;
-    private List<Pattern> ignoredUrls;
+public final class ParallelCrawInternal extends RecursiveTask<Boolean> {
+    private final String url;
+    private final Instant deadline;
+    private final int maxDepth;
+    private final ConcurrentHashMap<String, Integer> counts;
+    private final ConcurrentSkipListSet<String> visitedUrls;
+    private final Clock clock;
+    private final PageParserFactory pageParserFactory;
+    private final List<Pattern> ignoredUrls;
 
-    public ParallelCrawInternal(String url, Instant deadline, int maxDepth, Map<String, Integer> counts,Set<String> visitedUrls, Clock clock,
+    public ParallelCrawInternal(String url, Instant deadline, int maxDepth, ConcurrentHashMap<String, Integer> counts,ConcurrentSkipListSet<String> visitedUrls, Clock clock,
                                 PageParserFactory pageParserFactory, List<Pattern> ignoredUrls){
         this.url = url;
         this.deadline = deadline;
@@ -49,14 +51,14 @@ public class ParallelCrawInternal extends RecursiveTask<Boolean> {
         visitedUrls.add(url);
         PageParser.Result result = pageParserFactory.get(url).parse();
         for (Map.Entry<String, Integer> e : result.getWordCounts().entrySet()) {
-            counts.compute(e.getKey(),(key,value) -> (key == null) ? e.getValue() : e.getValue() + value);
+            counts.compute(e.getKey(),(word,number) -> (number == null) ? e.getValue() : e.getValue() + number);
         }
 
-        List<ParallelCrawInternal> subtasks = new ArrayList<>();
+        List<ParallelCrawInternal> parallelTasks = new ArrayList<>();
         for (String link : result.getLinks()) {
-            subtasks.add(new ParallelCrawInternal(link,deadline,maxDepth-1,counts,visitedUrls,clock,pageParserFactory,ignoredUrls));
+            parallelTasks.add(new ParallelCrawInternal(link,deadline,maxDepth-1,counts,visitedUrls,clock,pageParserFactory,ignoredUrls));
         }
-        invokeAll(subtasks);
+        invokeAll(parallelTasks);
         return true;
     }
 }
