@@ -45,10 +45,15 @@ public final class ParallelCrawInternal extends RecursiveTask<Boolean> {
                 return false;
             }
         }
-        if (visitedUrls.contains(url)) {
-            return false;
+        //Synchronized block
+        synchronized (this) {
+            if (visitedUrls.contains(url)) {
+                return false;
+            }
+            if(visitedUrls.add(url)){
+                return false;
+            }
         }
-        visitedUrls.add(url);
         PageParser.Result result = pageParserFactory.get(url).parse();
         for (Map.Entry<String, Integer> e : result.getWordCounts().entrySet()) {
             counts.compute(e.getKey(),(word,number) -> (number == null) ? e.getValue() : e.getValue() + number);
