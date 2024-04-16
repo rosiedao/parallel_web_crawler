@@ -46,12 +46,14 @@ public final class ParallelCrawInternal extends RecursiveTask<Boolean> {
             }
         }
         //Synchronized block
+
         synchronized (this) {
-            if (visitedUrls.contains(url)) {
+            try {
+                if (visitedUrls.contains(url)) {
                 return false;
-            }
-            if(visitedUrls.add(url)){
-                return false;
+                }visitedUrls.add(url);
+            }catch (Exception e){
+                e.printStackTrace();
             }
         }
         PageParser.Result result = pageParserFactory.get(url).parse();

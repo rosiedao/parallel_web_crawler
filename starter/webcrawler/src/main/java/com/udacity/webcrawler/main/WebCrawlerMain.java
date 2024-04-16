@@ -38,7 +38,7 @@ public final class WebCrawlerMain {
     CrawlResultWriter resultWriter = new CrawlResultWriter(result);
 
     // TODO: Write the crawl results to a JSON file (or System.out if the file name is empty)
-    if (!this.config.getResultPath().isEmpty()) {
+    /*if (!this.config.getResultPath().isEmpty()) {
       Path resultPath = Path.of(this.config.getResultPath());
       resultWriter.write(resultPath);
     } else {
@@ -49,9 +49,21 @@ public final class WebCrawlerMain {
       } catch (Exception e) {
         e.printStackTrace();
       }
-    }
+    }*/
+    try {
+      if (!this.config.getResultPath().isEmpty()) {
+        Path resultPath = Path.of(this.config.getResultPath());
+        resultWriter.write(resultPath);
+      } else {
+        Writer resultLog = new OutputStreamWriter(System.out);
+        resultWriter.write(resultLog);
+        resultLog.flush();
+      }
+    }catch (Exception e){
+      e.printStackTrace();
+  }
     // TODO: Write the profile data to a text file (or System.out if the file name is empty)
-    if (!this.config.getProfileOutputPath().isEmpty()) {
+    /*if (!this.config.getProfileOutputPath().isEmpty()) {
       Path profilePath = Path.of(this.config.getProfileOutputPath());
       profiler.writeData(profilePath);
     } else {
@@ -62,8 +74,21 @@ public final class WebCrawlerMain {
       } catch (Exception e) {
         e.printStackTrace();
       }
+    }*/
+    try {
+      if (!this.config.getProfileOutputPath().isEmpty()) {
+        Path profilePath = Path.of(this.config.getProfileOutputPath());
+        profiler.writeData(profilePath);
+      } else {
+        Writer profileLog = new OutputStreamWriter(System.out);
+        profiler.writeData(profileLog);
+        profileLog.flush();
+      }
+    }catch(Exception e){
+        e.printStackTrace();
+      }
     }
-  }
+
 
   public static void main(String[] args) throws Exception {
     if (args.length != 1) {
